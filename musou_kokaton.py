@@ -99,7 +99,6 @@ class Bird(pg.sprite.Sprite):
             self.dire = tuple(sum_mv)
             self.image = self.imgs[self.dire]
         screen.blit(self.image, self.rect)
-
         #追加機能1
         if key_lst[pg.K_LSHIFT]:#もしも左シフトが押されているときspeedは20
             self.speed = 20
