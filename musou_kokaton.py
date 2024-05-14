@@ -257,7 +257,7 @@ class NeoBeam:
         """
         self.bird = bird
         self.num = num
-
+        
 
     def gen_beams(self):
         """
