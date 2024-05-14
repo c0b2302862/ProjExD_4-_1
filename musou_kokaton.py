@@ -6,7 +6,7 @@ import time
 import pygame as pg
 
 
-WIDTH, HEIGHT = 1600, 900  # ゲームウィンドウの幅，高さ
+WIDTH, HEIGHT = 1200, 700  # ゲームウィンドウの幅，高さ
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -241,6 +241,25 @@ class Score:
         screen.blit(self.image, self.rect)
 
 
+class Gravity(pg.sprite.Sprite):
+    """
+    画面全体を覆う重力場を発生させるクラス
+    """
+    def __init__(self, life: int):
+        super().__init__()
+        self.image = pg.Surface((WIDTH, HEIGHT))
+        pg.draw.rect(self.image, (0,0,0), (0,0,WIDTH,HEIGHT))
+        self.rect = self.image.get_rect()
+        self.image.set_alpha(128)
+        self.life = life
+    
+    def update(self, screen: pg.Surface):
+        self.life -= 1
+        screen.blit(self.image, self.rect)
+        if self.life < 0:
+            self.kill()
+
+
 def main():
     pg.display.set_caption("真！こうかとん無双")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -252,6 +271,7 @@ def main():
     beams = pg.sprite.Group()
     exps = pg.sprite.Group()
     emys = pg.sprite.Group()
+    gravitys = pg.sprite.Group()
 
     tmr = 0
     clock = pg.time.Clock()
@@ -287,6 +307,21 @@ def main():
             pg.display.update()
             time.sleep(2)
             return
+        
+        if event.type == pg.KEYDOWN and score.value > 200 and event.key == pg.K_RETURN:
+            gravity = Gravity(400)
+            gravitys.add(gravity)
+            score.value -= 200  # 200点ダウン
+        
+        if gravitys:
+            gravity.update(screen)
+            for bomb in bombs:
+                bombs.remove(bomb)
+                exps.add(Explosion(bomb, 50))
+            for emy in emys:
+                emys.remove(emy)
+                exps.add(Explosion(emy, 50))
+                bird.change_img(6, screen)  # こうかとん喜びエフェクト
 
         bird.update(key_lst, screen)
         beams.update()
